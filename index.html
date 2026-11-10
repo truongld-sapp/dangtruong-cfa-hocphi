@@ -413,6 +413,27 @@ var PKG_ORDER=['Hỗ trợ ôn thi','Cấp chứng chỉ hoàn thành khóa họ
 var BANK={bank:'Ngân hàng TMCP Quân đội (MB)',acc:'303886688',owner:'CÔNG TY TNHH GIÁO DỤC SCFA',hotline:'1900 2225',web:'sapp.edu.vn'};
 
 function D(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2]);}
+/* Thời khóa biểu: mỗi dòng gồm mã lớp F2F (và mã Live Online đi kèm) */
+var E='(18:30 - 21:30)', C='(14:00 - 17:00)';
+var SCHED_SRC=[
+ [['CFA103.58','CFA1H03.58'],['Tối Thứ 5 '+E,'Chiều Chủ Nhật '+C]],
+ [['CFA203.16','CFA2H03.16'],['Tối Thứ 3 '+E,'Tối Chủ Nhật '+E]],
+ [['CFA103.59'],['Tối Thứ 2 '+E,'Tối Thứ 6 '+E]],
+ [['CFA202.16','CFA2H02.16'],['Tối Thứ 3 '+E,'Chiều Thứ 7 '+C]],
+ [['CFA102.51','CFA1H02.51'],['Tối Thứ 4 '+E,'Tối Chủ Nhật '+E]],
+ [['CFA105.14','CFA1H05.14'],['Tối Thứ 2 '+E,'Tối Thứ 6 '+E]],
+ [['CFA203.17','CFA2H03.17'],['Tối Thứ 4 '+E,'Tối Thứ 7 '+E]],
+ [['CFA303.06','CFA3H03.06'],['Tối Thứ 3 '+E,'Chiều Thứ 7 '+C]],
+ [['CFA103.61'],['Tối Thứ 3 '+E,'Chiều Thứ 7 '+C]],
+ [['CFA103.62','CFA1H03.62'],['Tối Thứ 5 '+E,'Chiều Chủ Nhật '+C]],
+ [['CFA202.17','CFA2H02.17'],['Tối Thứ 2 '+E,'Tối Thứ 6 '+E]],
+ [['CFA302.06','CFA3H02.06'],['Tối Thứ 4 '+E,'Tối Thứ 7 '+E]],
+ [['CFA102.53','CFA1H02.53'],['Tối Thứ 2 '+E,'Tối Thứ 5 '+E]],
+ [['CFA105.15','CFA1H05.15'],['Tối Thứ 4 '+E,'Tối Chủ Nhật '+E]],
+ [['CFA205.04'],['Tối Thứ 5 '+E,'Chiều Chủ Nhật '+C]],
+ [['CFA105.16','CFA1H05.16'],['Tối Thứ 3 '+E,'Chiều Thứ 7 '+C]]
+];
+var SCHED={}; SCHED_SRC.forEach(function(x){ x[0].forEach(function(c){ SCHED[c]=x[1]; }); });
 var CLASSES=[
  ['CFA117.1026',1,'RO','ALL','2026-10-05'],['CFA210.1026',2,'RO','ALL','2026-10-05'],
  ['CFA202.16',2,'F2F','HN','2026-10-20'],['CFA2H02.16',2,'LO','ALL','2026-10-20'],
@@ -654,7 +675,7 @@ function renderQuote(r){
     +'<dt>Học viên</dt><dd>'+(S.name.trim()?esc(S.name.trim()):'<span style="color:var(--muted)">(chưa nhập)</span>')+'</dd>'
     +'<dt>Liên hệ</dt><dd>'+esc([S.phone.trim(),S.email.trim()].filter(Boolean).join(' · ')||'(chưa nhập)')+'</dd>'
     +'<dt>TVTS</dt><dd>'+esc(t[0])+' · '+esc(t[1])+'<br>'+esc(t[2])+'</dd>'
-    +'<dt>Lớp đầu tiên</dt><dd><span class="mono">'+(r.cls?esc(r.cls.code):'')+'</span>'+(r.cls?' · khai giảng '+dmy(r.cls.kg):'')+'</dd></dl>';
+    +'<dt>Lớp đầu tiên</dt><dd><span class="mono">'+(r.cls?esc(r.cls.code):'')+'</span>'+(r.cls?' · khai giảng '+dmy(r.cls.kg):'')+'</dd>'+(r.cls&&SCHED[r.cls.code]?'<dt>Lịch học</dt><dd>'+SCHED[r.cls.code].map(esc).join('<br>')+'</dd>':'')+'</dl>';
   var cmpOn=S.cmp&&r.cls&&(4-r.cls.level)>=2;
   if(cmpOn) h+=renderCmp(compareData());
   else{
@@ -701,6 +722,7 @@ function quoteText(r){
   L.push('BÁO GIÁ HỌC PHÍ CFA® – SAPP ACADEMY');
   L.push('Học viên: '+(S.name.trim()||'...')+(S.phone.trim()?' – '+S.phone.trim():''));
   if(r.cls) L.push('Lớp khai giảng đầu tiên: '+r.cls.code+' (khai giảng '+dmy(r.cls.kg)+')');
+  if(r.cls&&SCHED[r.cls.code]) L.push('Lịch học: '+SCHED[r.cls.code].join(' + '));
   L.push('');
   var cmpT=S.cmp&&r.cls&&(4-r.cls.level)>=2;
   if(cmpT){
